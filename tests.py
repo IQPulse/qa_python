@@ -72,6 +72,19 @@ class TestBooksCollector:
         collector.set_book_genre(book_name, genre)
         assert collector.get_books_for_children() == expected_result
 
+    @pytest.mark.parametrize("book_name, genre, expected_result", [
+        ("Гордость и предубеждение и зомби", "Фантастика", ["Гордость и предубеждение и зомби"]),
+        ("Что делать, если ваш кот хочет вас убить", "Комедии", ["Что делать, если ваш кот хочет вас убить"]),
+        ("Скажи ей, что она красива", "Ужасы", [])])
+    def test_books_with_age_rating_not_for_children(self, collector, book_name, genre, expected_result):
+        collector.add_new_book(book_name)
+        collector.set_book_genre(book_name, genre)
+
+        if genre not in collector.genre_age_rating and genre in collector.genre:
+            assert collector.get_books_for_children() == expected_result
+        else:
+            assert collector.get_books_for_children() == []
+
     @pytest.mark.parametrize("book_name, expected_result", [("Тестовая книга", "")])
     def test_get_genre_for_book_without_genre(self, collector, book_name, expected_result):
         collector.add_new_book(book_name)
