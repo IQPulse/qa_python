@@ -1,10 +1,4 @@
 import pytest
-from main import BooksCollector
-
-@pytest.fixture
-def collector():
-    return BooksCollector()
-
 class TestBooksCollector:
 
     @pytest.mark.parametrize("book_name, expected_result", [("Гордость и предубеждение и зомби", 1),
