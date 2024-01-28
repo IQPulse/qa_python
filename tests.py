@@ -66,24 +66,14 @@ class TestBooksCollector:
         collector.add_book_in_favorites(book_name1)
         assert collector.get_list_of_favorites_books() == expected_result
 
-    @pytest.mark.parametrize("book_name, genre, expected_result", [("Скажи ей, что она красива", "Комедии", ["Скажи ей, что она красива"])])
-    def test_books_with_age_rating_not_for_children(self, collector, book_name, genre, expected_result):
-        collector.add_new_book(book_name)
-        collector.set_book_genre(book_name, genre)
-        assert collector.get_books_for_children() == expected_result
 
-    @pytest.mark.parametrize("book_name, genre, expected_result", [
-        ("Гордость и предубеждение и зомби", "Фантастика", ["Гордость и предубеждение и зомби"]),
-        ("Что делать, если ваш кот хочет вас убить", "Комедии", ["Что делать, если ваш кот хочет вас убить"]),
-        ("Скажи ей, что она красива", "Ужасы", [])])
-    def test_books_with_age_rating_not_for_children(self, collector, book_name, genre, expected_result):
-        collector.add_new_book(book_name)
-        collector.set_book_genre(book_name, genre)
+    @pytest.mark.parametrize("genre", ['Фантастика', 'Ужасы', 'Детективы', 'Мультфильмы', 'Комедии'])
+    def test_books_with_age_rating_not_for_children(self, collector, genre):
 
-        if genre not in collector.genre_age_rating and genre in collector.genre:
-            assert collector.get_books_for_children() == expected_result
-        else:
-            assert collector.get_books_for_children() == []
+        books = {'Книга 1': 'Фантастика','Книга 2': 'Ужасы','Книга 3': 'Детективы','Книга 4': 'Мультфильмы','Книга 5': 'Комедии'}
+        collector.books_genre = books
+        expected_result = genre not in collector.genre_age_rating
+        assert expected_result == (genre not in collector.get_books_for_children())
 
     @pytest.mark.parametrize("book_name, expected_result", [("Тестовая книга", "")])
     def test_get_genre_for_book_without_genre(self, collector, book_name, expected_result):
