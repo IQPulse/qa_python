@@ -66,7 +66,7 @@ class TestBooksCollector:
         collector.add_book_in_favorites(book_name1)
         assert collector.get_list_of_favorites_books() == expected_result
 
-    @pytest.mark.parametrize("book_name, genre, expected_result", [("Скажи ей, что она красива", "Мелодрама", ["Скажи ей, что она красива"])])
+    @pytest.mark.parametrize("book_name, genre, expected_result", [("Скажи ей, что она красива", "Комедии", ["Скажи ей, что она красива"])])
     def test_books_with_age_rating_not_for_children(self, collector, book_name, genre, expected_result):
         collector.add_new_book(book_name)
         collector.set_book_genre(book_name, genre)
