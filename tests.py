@@ -1,24 +1,81 @@
-from main import BooksCollector
-
-# класс TestBooksCollector объединяет набор тестов, которыми мы покрываем наше приложение BooksCollector
-# обязательно указывать префикс Test
+import pytest
 class TestBooksCollector:
 
-    # пример теста:
-    # обязательно указывать префикс test_
-    # дальше идет название метода, который тестируем add_new_book_
-    # затем, что тестируем add_two_books - добавление двух книг
-    def test_add_new_book_add_two_books(self):
-        # создаем экземпляр (объект) класса BooksCollector
-        collector = BooksCollector()
+    @pytest.mark.parametrize("book_name, expected_result", [("Гордость и предубеждение и зомби", 1),
+                                                           ("Что делать, если ваш кот хочет вас убить", 1)])
+    def test_add_new_book(self, collector, book_name, expected_result):
+        collector.add_new_book(book_name)
+        assert len(collector.get_books_genre()) == expected_result
 
-        # добавляем две книги
-        collector.add_new_book('Гордость и предубеждение и зомби')
-        collector.add_new_book('Что делать, если ваш кот хочет вас убить')
+    @pytest.mark.parametrize("book_name, genre, expected_result", [("Гордость и предубеждение и зомби", "Фантастика", "Фантастика"),
+                                                                   ("Что делать, если ваш кот хочет вас убить", "Комедии", "Комедии")])
+    def test_set_book_genre(self, collector, book_name, genre, expected_result):
+        collector.add_new_book(book_name)
+        collector.set_book_genre(book_name, genre)
+        assert collector.get_book_genre(book_name) == expected_result
 
-        # проверяем, что добавилось именно две
-        # словарь books_rating, который нам возвращает метод get_books_rating, имеет длину 2
-        assert len(collector.get_books_rating()) == 2
+    @pytest.mark.parametrize("book_name, genre", [("Гордость и предубеждение и зомби", "Фантастика"),
+                                                  ("Что делать, если ваш кот хочет вас убить", "Комедии")])
+    def test_get_book_genre(self, collector, book_name, genre):
+        collector.add_new_book(book_name)
+        collector.set_book_genre(book_name, genre)
+        assert collector.get_book_genre(book_name) == genre
 
-    # напиши свои тесты ниже
-    # чтобы тесты были независимыми в каждом из них создавай отдельный экземпляр класса BooksCollector()
+    @pytest.mark.parametrize("genre, expected_result", [("Фантастика", ["Гордость и предубеждение и зомби"]),
+                                                       ("Комедии", ["Что делать, если ваш кот хочет вас убить"])])
+    def test_get_books_with_specific_genre(self, collector, genre, expected_result):
+        collector.add_new_book("Гордость и предубеждение и зомби")
+        collector.add_new_book("Что делать, если ваш кот хочет вас убить")
+        collector.set_book_genre("Гордость и предубеждение и зомби", "Фантастика")
+        collector.set_book_genre("Что делать, если ваш кот хочет вас убить", "Комедии")
+        assert collector.get_books_with_specific_genre(genre) == expected_result
+
+    @pytest.mark.parametrize("book_name1, genre1, book_name2, genre2", [("Гордость и предубеждение и зомби", "Фантастика", "Что делать, если ваш кот хочет вас убить", "Комедии")])
+    def test_get_books_genre(self, collector, book_name1, genre1, book_name2, genre2):
+        collector.add_new_book(book_name1)
+        collector.add_new_book(book_name2)
+        collector.set_book_genre(book_name1, genre1)
+        collector.set_book_genre(book_name2, genre2)
+        assert collector.get_books_genre() == {book_name1: genre1, book_name2: genre2}
+
+    @pytest.mark.parametrize("book_name1, genre1, book_name2, genre2, expected_result", [("Гордость и предубеждение и зомби", "Фантастика", "Что делать, если ваш кот хочет вас убить", "Комедии", ["Что делать, если ваш кот хочет вас убить"])])
+    def test_get_books_for_children(self, collector, book_name1, genre1, book_name2, genre2, expected_result):
+        collector.add_new_book(book_name1)
+        collector.add_new_book(book_name2)
+        collector.set_book_genre(book_name1, genre1)
+        collector.set_book_genre(book_name2, genre2)
+        assert collector.get_books_for_children() == expected_result
+
+    @pytest.mark.parametrize("book_name, expected_result", [("Гордость и предубеждение и зомби", ["Гордость и предубеждение и зомби"])])
+    def test_add_book_in_favorites(self, collector, book_name, expected_result):
+        collector.add_new_book(book_name)
+        collector.add_book_in_favorites(book_name)
+        assert collector.get_list_of_favorites_books() == expected_result
+
+    @pytest.mark.parametrize("book_name, expected_result", [("Гордость и предубеждение и зомби", []), ("Что делать, если ваш кот хочет вас убить", [])])
+    def test_delete_book_from_favorites(self, collector, book_name, expected_result):
+        collector.add_new_book(book_name)
+        collector.add_book_in_favorites(book_name)
+        collector.delete_book_from_favorites(book_name)
+        assert collector.get_list_of_favorites_books() == expected_result
+
+    @pytest.mark.parametrize("book_name1, expected_result", [("Гордость и предубеждение и зомби", ["Гордость и предубеждение и зомби"]),
+                                                             ("Что делать, если ваш кот хочет вас убить", ["Что делать, если ваш кот хочет вас убить"])])
+    def test_get_list_of_favorites_books(self, collector, book_name1, expected_result):
+        collector.add_new_book(book_name1)
+        collector.add_book_in_favorites(book_name1)
+        assert collector.get_list_of_favorites_books() == expected_result
+
+
+    @pytest.mark.parametrize("genre", ['Фантастика', 'Ужасы', 'Детективы', 'Мультфильмы', 'Комедии'])
+    def test_books_with_age_rating_not_for_children(self, collector, genre):
+
+        books = {'Книга 1': 'Фантастика','Книга 2': 'Ужасы','Книга 3': 'Детективы','Книга 4': 'Мультфильмы','Книга 5': 'Комедии'}
+        collector.books_genre = books
+        expected_result = genre not in collector.genre_age_rating
+        assert expected_result == (genre not in collector.get_books_for_children())
+
+    @pytest.mark.parametrize("book_name, expected_result", [("Тестовая книга", "")])
+    def test_get_genre_for_book_without_genre(self, collector, book_name, expected_result):
+        collector.add_new_book(book_name)
+        assert collector.get_book_genre(book_name) == expected_result
